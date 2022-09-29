@@ -1,5 +1,5 @@
 const { gql } = require("apollo-server-express");
-const resolvers = require("./resolvers").resolvers;
+const { resolvers } = require("./resolvers");
 
 const typeDefs = gql`
   type Link {

@@ -1,8 +1,7 @@
-const  fetch = require("cross-fetch") ;
-const  jsdom = require("jsdom");
-const  ogs  = require("open-graph-scraper");
-const  TinyURL = require("tinyurl");
-
+const fetch = require("cross-fetch");
+const jsdom = require("jsdom");
+const ogs = require("open-graph-scraper");
+const TinyURL = require("tinyurl");
 
 const resolvers = {
   Query: {
@@ -11,7 +10,9 @@ const resolvers = {
 
       if (message?.includes("@")) {
         const pattern = /\@[a-z0-9_-]+/gi;
-        resObj.mentions = message.match(pattern).map((mention) => mention.slice(1));
+        resObj.mentions = message
+          .match(pattern)
+          .map((mention) => mention.slice(1));
       }
 
       if (message.includes("(") && message.includes(")")) {
@@ -41,9 +42,10 @@ const resolvers = {
           tinyURL = res;
         });
 
-        await ogs(options, (error, {ogTitle, ogDescription}, response) => {
+        await ogs(options, (error, { ogTitle, ogDescription }, response) => {
           if (ogTitle && ogDescription) {
-            const desc = `&quot;${ogDescription.slice(1,
+            const desc = `&quot;${ogDescription.slice(
+              1,
               ogDescription.split("").length - 1
             )} ${tinyURL} &quot;`;
 

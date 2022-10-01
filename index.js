@@ -1,10 +1,11 @@
-const express = require("express"); 
-const schema = require("./schema");
-const { ApolloServer } = require("apollo-server-express");
+const express =  require("express");
+const { resolvers } =  require("./resolvers");
+const { typeDefs } =  require("./schema");
+const  { ApolloServer } =  require("apollo-server-express");
 
 const server = new ApolloServer({
-  typeDefs: schema.typeDefs,
-  resolvers: schema.resolvers,
+  typeDefs: typeDefs,
+  resolvers: resolvers,
 });
 
 const app = express();
@@ -15,6 +16,7 @@ async function startServer() {
 }
 
 startServer();
+
 
 app.listen({ port: 4000 }, () =>
   console.log(`Server ready at 

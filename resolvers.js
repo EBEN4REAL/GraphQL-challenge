@@ -1,19 +1,17 @@
-const extractUrls = require("extract-urls");
-const fetch = require("cross-fetch");
-const jsdom = require("jsdom");
-const ogs = require("open-graph-scraper");
-const TinyURL = require("tinyurl");
+const  fetch = require("cross-fetch") ;
+const  jsdom = require("jsdom");
+const  ogs  = require("open-graph-scraper");
+const  TinyURL = require("tinyurl");
+
 
 const resolvers = {
   Query: {
-    records: (_parent, { message }) => {
+    records: (parent, { message }) => {
       const resObj = {};
 
-      if (message.includes("@")) {
+      if (message?.includes("@")) {
         const pattern = /\@[a-z0-9_-]+/gi;
-        resObj.mentions = message
-          .match(pattern)
-          .map((mention) => mention.slice(1));
+        resObj.mentions = message.match(pattern).map((mention) => mention.slice(1));
       }
 
       if (message.includes("(") && message.includes(")")) {
@@ -43,26 +41,34 @@ const resolvers = {
           tinyURL = res;
         });
 
-        await ogs(options, (error, results, response) => {
-          if (results.ogTitle && results.ogDescription) {
-            const desc = `&quot;${results.ogDescription.slice(
-              1,
-              results.ogDescription.split("").length - 1
+        await ogs(options, (error, {ogTitle, ogDescription}, response) => {
+          if (ogTitle && ogDescription) {
+            const desc = `&quot;${ogDescription.slice(1,
+              ogDescription.split("").length - 1
             )} ${tinyURL} &quot;`;
-            title = `${results.ogTitle}: ${desc}`;
+
+            title = `${ogTitle}: ${desc}`;
           }
         });
 
         const getTitle = await fetch(`${url}`);
         const html = await getTitle.text();
-        const dom = new jsdom.JSDOM(html, "text/html");
-        htmlTitle = dom.window.document.title;
+        const dom = new jsdom.JSDOM(html);
+        const htmlTitle = dom.window.document.title;
 
         return title ? title : htmlTitle;
       };
 
-      if (extractUrls(message)?.length) {
-        resObj.links = extractUrls(message).map((url) => {
+      const urlRegex = /(https?:\/\/[^ ]*)/gi;
+      const urls = [];
+      let fond;
+
+      while ((fond = urlRegex.exec(message))) {
+        urls.push(fond[1]);
+      }
+
+      if (urls?.length) {
+        resObj.links = urls.map((url) => {
           const title = getTitle(url);
 
           return {
